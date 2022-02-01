@@ -121,7 +121,7 @@ class Title(models.Model):
     )
     category = models.ForeignKey(
         Category,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='Категория',
         help_text='Категория'
