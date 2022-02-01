@@ -6,6 +6,7 @@ User = get_user_model()
 
 
 class Review(models.Model):
+    """Модель отзыва на произведение."""
     text = models.TextField()
     author = models.ForeignKey(
         User,
@@ -19,10 +20,12 @@ class Review(models.Model):
     )
 
     def __str__(self) -> str:
+        """Переопределяем метод для вывода информации об объекте."""
         return f'Отзыв пользователя {self.author}, оценка {self.score}.'
 
 
 class Comment(models.Model):
+    """Модель комментария к отзыву на произведение."""
     text = models.TextField()
     author = models.ForeignKey(
         User,
@@ -40,7 +43,8 @@ class Comment(models.Model):
     )
 
     def __str__(self) -> str:
+        """Переопределяем метод для вывода информации об объекте."""
         return (
-            'Коментарий пользователя '
+            'Комментарий пользователя '
             f'{self.author} к отзыву с ID = {self.review.id}'
         )
