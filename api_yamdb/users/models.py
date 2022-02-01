@@ -17,9 +17,9 @@ class User(AbstractUser):
     )
     role = models.CharField(
         'Роль',
-        blank=False,
         max_length=20,
-        choices=ROLES, default='user'
+        choices=ROLES,
+        default='user'
     )
     bio = models.TextField(
         'Биография',
@@ -27,15 +27,16 @@ class User(AbstractUser):
     )
     email = models.EmailField(
         'E-mail',
-        blank=False,
-        unique=True,
+        unique=True
     )
 
     class Meta:
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
-                fields=['username', 'email'], name='unique user')
-        ]
+                fields=('username', 'email'),
+                name='unique user'
+            ),
+        )
 
     @property
     def is_administrator(self):
