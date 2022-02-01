@@ -81,6 +81,7 @@ class Title(models.Model):
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
+        null=True,
         related_name='titles',
         verbose_name='Категория',
         help_text='Категория'
@@ -126,7 +127,7 @@ class Genre_Title(models.Model):
 
 class Review(models.Model):
     """Модель отзыва на произведение."""
-    SCORES = tuple(range(1, 11))
+    SCORES = tuple([(i, i) for i in range(1, 11)])
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
