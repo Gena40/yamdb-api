@@ -7,13 +7,19 @@ User = get_user_model()
 
 class Review(models.Model):
     """Модель отзыва на произведение."""
+    SCORES = tuple(range(1, 11))
+    # title = models.ForeignKey(
+    #     Title,
+    #     on_delete=models.CASCADE,
+    #     related_name='titles'
+    # )
     text = models.TextField()
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='reviews'
     )
-    score = models.IntegerField()
+    score = models.IntegerField(choices=SCORES)
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True
@@ -37,7 +43,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments'
     )
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления',
         auto_now_add=True
     )
