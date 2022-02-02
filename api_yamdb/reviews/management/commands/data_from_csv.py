@@ -1,7 +1,6 @@
 import os
 import datetime
 from csv import DictReader
-from turtle import onclick
 from django.core.management.base import BaseCommand
 from reviews.models import Category, Genre, Title, Genre_Title
 from reviews.models import User
@@ -17,18 +16,18 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         print(self.shift_path)
         # Категории
-        # self.insert_categories()
+        self.insert_categories()
         # Жанры
-        # self.insert_genres()
+        self.insert_genres()
         # Произведения
-        # self.insert_titles()
+        self.insert_titles()
         # Жанры-Произведения
-        # self.insert_genge_titles()
+        self.insert_genge_titles()
         # Пользователи
-        # self.insert_users()
+        self.insert_users()
         # отзывы
-        # self.insert_reviews()
-        # комментарии
+        self.insert_reviews()
+        # комменты
         self.insert_comments()
 
     def insert_categories(self):
@@ -99,7 +98,7 @@ class Command(BaseCommand):
             csvdict = DictReader(f)
             for row in csvdict:
                 try:
-                    password = 'Fake_User_1234'
+                    # password = 'Fake_User_1234'
                     User.objects.create(**row)
                     print(row, 'добавлен')
                 except Exception as err:
@@ -126,7 +125,7 @@ class Command(BaseCommand):
                     if all((title, author, dt)):
                         # print(dt)
                         # print(row)
-                        obj = Review.objects.create(
+                        Review.objects.create(
                             title=title, author=author, id=id,
                             text=text, score=score, pub_date=dt)
                         # obj.pub_date = dt
