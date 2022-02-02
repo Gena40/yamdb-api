@@ -48,8 +48,8 @@ class GenreAdmin(admin.ModelAdmin):
 
 class TitleAdmin(admin.ModelAdmin):
     list_display = (
-        'pk', 'name', 'year', 'description', 'category', 'genre')
-    list_editable = ('name', 'year', 'description', 'category', 'genre')
+        'pk', 'name', 'year', 'description', 'category')
+    list_editable = ('name', 'year', 'description', 'category')
     search_fields = ('name', 'category', 'genre')
     list_filter = ('year', 'category', 'genre')
     empty_value_display = '-пусто-'
