@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 
 User = get_user_model()
@@ -131,7 +132,7 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='titles',
+        related_name='reviews',
         help_text='Произведение',
         verbose_name='Произведение'
     )
@@ -153,7 +154,7 @@ class Review(models.Model):
     )
     pub_date = models.DateTimeField(
         'Дата публикации',
-        auto_now_add=True,
+        default=timezone.now,
         help_text='Дата публикации'
     )
 
@@ -189,7 +190,7 @@ class Comment(models.Model):
     )
     pub_date = models.DateTimeField(
         'Дата добавления',
-        auto_now_add=True,
+        default=timezone.now,
         help_text='Дата добавления'
     )
 

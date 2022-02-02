@@ -1,7 +1,6 @@
 import os
 import datetime
 from csv import DictReader
-from turtle import onclick
 from django.core.management.base import BaseCommand
 from reviews.models import Category, Genre, Title, Genre_Title
 from reviews.models import User
@@ -17,7 +16,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         print(self.shift_path)
         # Категории
-        # self.insert_categories()
+        self.insert_categories()
         # Жанры
         # self.insert_genres()
         # Произведения
@@ -29,11 +28,11 @@ class Command(BaseCommand):
         # отзывы
         # self.insert_reviews()
         # комментарии
-        self.insert_comments()
+        # self.insert_comments()
 
     def insert_categories(self):
         filename = self.shift_path + '\\category.csv'
-        print(filename)
+        print('insert_categories - ', filename)
         with open(filename, 'r', encoding='utf-8') as f:
             csvdict = DictReader(f)
             for row in csvdict:
@@ -99,7 +98,6 @@ class Command(BaseCommand):
             csvdict = DictReader(f)
             for row in csvdict:
                 try:
-                    password = 'Fake_User_1234'
                     User.objects.create(**row)
                     print(row, 'добавлен')
                 except Exception as err:
@@ -123,15 +121,7 @@ class Command(BaseCommand):
                     text = row.pop('text')
                     score = row.pop('score')
 
-                    if all((title, author, dt)):
-                        # print(dt)
-                        # print(row)
-                        obj = Review.objects.create(
-                            title=title, author=author, id=id,
-                            text=text, score=score, pub_date=dt)
-                        # obj.pub_date = dt
-                        # print(title, author, row, dt, 'добавлен')
-                    else:
+                    if not all((title, author, dt)):
                         print(row, 'нельзя создать')
                 except Exception as err:
                     print(err)
