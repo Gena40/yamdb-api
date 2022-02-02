@@ -1,8 +1,11 @@
 # from django.shortcuts import get_object_or_404
 from rest_framework import viewsets  # , permissions
-# from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import mixins
+from rest_framework.pagination import LimitOffsetPagination
 from reviews.models import Review, Comment
+from reviews.models import Category, Genre
 from api.serializers import ReviewSerializer, CommentSerializer
+from api.serializers import CategorySerializer, GenreSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -38,3 +41,33 @@ class CommentViewSet(viewsets.ModelViewSet):
     #     post_id = self.kwargs.get('post_id')
     #     this_post = get_object_or_404(Post, id=post_id)
     #     return this_post.comments.all()
+
+
+class CategoryViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin
+):
+    '''
+    Класс CategoryViewSet для модели Category.
+    '''
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    lookup_field = 'slug'
+    pagination_class = LimitOffsetPagination
+
+
+class GenreViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin
+):
+    '''
+    Класс CategoryViewSet для модели Category.
+    '''
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    lookup_field = 'slug'
+    pagination_class = LimitOffsetPagination
