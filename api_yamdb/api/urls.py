@@ -1,10 +1,16 @@
 from rest_framework.routers import SimpleRouter
+from rest_framework import routers
 from django.urls import path, include
-from api.views import ReviewViewSet, CommentViewSet
-from api.views import CategoryViewSet, GenreViewSet
-
+from api.views import (ReviewViewSet, CommentViewSet,
+                       CategoryViewSet, GenreViewSet,
+                       send_confirmation_code, get_token,
+                       UsersViewSet)
+                        
 
 app_name = 'api'
+
+router = routers.DefaultRouter()
+router.register('users', UsersViewSet, basename='user')
 
 router = SimpleRouter()
 router.register('v1/categories', CategoryViewSet)
@@ -21,5 +27,8 @@ router.register(
 )
 
 urlpatterns = [
+    path('v1/auth/signup/', send_confirmation_code,
+         name='SendConfirmationCode'),
+    path('v1/auth/token/', get_token, name='GetToken'),
     path('', include(router.urls)),
 ]
