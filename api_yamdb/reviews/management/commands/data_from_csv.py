@@ -18,17 +18,17 @@ class Command(BaseCommand):
         # Категории
         self.insert_categories()
         # Жанры
-        # self.insert_genres()
+        self.insert_genres()
         # Произведения
-        # self.insert_titles()
+        self.insert_titles()
         # Жанры-Произведения
-        # self.insert_genge_titles()
+        self.insert_genge_titles()
         # Пользователи
-        # self.insert_users()
+        self.insert_users()
         # отзывы
-        # self.insert_reviews()
-        # комментарии
-        # self.insert_comments()
+        self.insert_reviews()
+        # комменты
+        self.insert_comments()
 
     def insert_categories(self):
         filename = self.shift_path + '\\category.csv'
@@ -120,8 +120,15 @@ class Command(BaseCommand):
                     id = row.pop('id')
                     text = row.pop('text')
                     score = row.pop('score')
-
-                    if not all((title, author, dt)):
+                    if all((title, author, dt)):
+                        # print(dt)
+                        # print(row)
+                        Review.objects.create(
+                            title=title, author=author, id=id,
+                            text=text, score=score, pub_date=dt)
+                        # obj.pub_date = dt
+                        # print(title, author, row, dt, 'добавлен')
+                    else:
                         print(row, 'нельзя создать')
                 except Exception as err:
                     print(err)
