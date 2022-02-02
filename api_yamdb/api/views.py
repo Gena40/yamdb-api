@@ -1,15 +1,15 @@
+from rest_framework.pagination import LimitOffsetPagination
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, viewsets, status, viewsets, permissions
+from rest_framework import filters, status, viewsets, permissions, mixins
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.pagination import PageNumberPagination
-# from rest_framework.pagination import LimitOffsetPagination
 from api_yamdb import settings
 from users.models import User
-from reviews.models import Review, Comment
+from reviews.models import Review, Comment, Category, Genre
 from api.serializers import (ReviewSerializer, CommentSerializer, UserEmailSerializer,
                             ConfirmationCodeSerializer, UserSerializer, MeSerializer)
 from .permissions import (IsAdministrator, IsAdministratorOrReadOnly,
@@ -130,3 +130,33 @@ class CommentViewSet(viewsets.ModelViewSet):
     #     post_id = self.kwargs.get('post_id')
     #     this_post = get_object_or_404(Post, id=post_id)
     #     return this_post.comments.all()
+
+
+class CategoryViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin
+):
+    '''
+    Класс CategoryViewSet для модели Category.
+    '''
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    lookup_field = 'slug'
+    pagination_class = LimitOffsetPagination
+
+
+class GenreViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin
+):
+    '''
+    Класс CategoryViewSet для модели Category.
+    '''
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    lookup_field = 'slug'
+    pagination_class = LimitOffsetPagination
