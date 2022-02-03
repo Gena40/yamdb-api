@@ -11,19 +11,25 @@ from rest_framework.pagination import PageNumberPagination
 
 from api_yamdb import settings
 
-from api.serializers import ReviewSerializer, CommentSerializer
-from api.serializers import CategorySerializer, GenreSerializer
-from api.serializers import TitleSerializer, TitleEditSerializer
-from api.serializers import UserEmailSerializer, ConfirmationCodeSerializer
-from api.serializers import UserSerializer, MeSerializer
-
-from api.permissions import IsAdministrator, IsAdministratorOrReadOnly
-from api.permissions import AuthorStaffOrReadOnly
-
-from reviews.models import Review, Comment
-from reviews.models import Category, Genre, Title
-
 from users.models import User
+from reviews.models import Review, Comment, Category, Genre, Title
+from api.serializers import (
+    ReviewSerializer,
+    CommentSerializer,
+    UserEmailSerializer,
+    ConfirmationCodeSerializer,
+    UserSerializer,
+    MeSerializer,
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer,
+    TitleEditSerializer
+)
+from api.permissions import (
+    IsAdministrator,
+    AuthorStaffOrReadOnly,
+    IsAdministratorOrReadOnly
+)
 
 
 @api_view(['POST'])
@@ -67,17 +73,17 @@ def get_token(request):
 
 
 class UsersViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated, IsAdministrator]
+    permission_classes = (permissions.IsAuthenticated, IsAdministrator)
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = (filters.SearchFilter,)
     pagination_class = PageNumberPagination
-    search_fields = ['username']
+    search_fields = ('username',)
     lookup_field = 'username'
 
     @action(
         methods=['patch', 'get'],
-        permission_classes=[permissions.IsAuthenticated],
+        permission_classes=(permissions.IsAuthenticated,),
         detail=False,
         url_path='me',
         url_name='me'
@@ -97,7 +103,7 @@ class UsersViewSet(viewsets.ModelViewSet):
 
 
 class GetUserViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated, IsAdministrator]
+    permission_classes = (permissions.IsAuthenticated, IsAdministrator)
     serializer_class = UserSerializer
 
     def get_queryset(self):
@@ -109,36 +115,40 @@ class GetUserViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    # pagination_class = LimitOffsetPagination
-    # permission_classes = (
-    #     permissions.IsAuthenticatedOrReadOnly,
-    #     IsAuthorOrReadOnly)
-    # filter_backends = (DjangoFilterBackend,)
-    # filterset_fields = ('group',)
+    pagination_class = LimitOffsetPagination
+    permission_classes = (AuthorStaffOrReadOnly,)
 
-    # def perform_create(self, serializer):
-    #     serializer.save(author=self.request.user)
+    def perform_create(self, serializer):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        serializer.save(
+            author=self.request.user,
+            title=title
+        )
+
+    def get_queryset(self):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        return title.reviews.all()
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    # permission_classes = (
-    #     permissions.IsAuthenticatedOrReadOnly,
-    #     IsAuthorOrReadOnly)
+    permission_classes = (AuthorStaffOrReadOnly,)
 
-    # def perform_create(self, serializer):
-    #     post_id = self.kwargs.get('post_id')
-    #     this_post = get_object_or_404(Post, id=post_id)
-    #     serializer.save(
-    #         author=self.request.user,
-    #         post=this_post
-    #     )
+    def perform_create(self, serializer):
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, id=review_id)
+        serializer.save(
+            author=self.request.user,
+            review=review
+        )
 
-    # def get_queryset(self):
-    #     post_id = self.kwargs.get('post_id')
-    #     this_post = get_object_or_404(Post, id=post_id)
-    #     return this_post.comments.all()
+    def get_queryset(self):
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, id=review_id)
+        return review.comments.all()
 
 
 class CategoryViewSet(

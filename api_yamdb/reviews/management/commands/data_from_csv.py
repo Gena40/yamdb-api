@@ -14,20 +14,12 @@ class Command(BaseCommand):
     shift_path = os.path.join(shift_path, 'data')
 
     def handle(self, *args, **kwargs):
-        print(self.shift_path)
-        # Категории
         self.insert_categories()
-        # Жанры
         self.insert_genres()
-        # Произведения
         self.insert_titles()
-        # Жанры-Произведения
         self.insert_genge_titles()
-        # Пользователи
         self.insert_users()
-        # отзывы
         self.insert_reviews()
-        # комменты
         self.insert_comments()
 
     def insert_categories(self):
@@ -98,7 +90,6 @@ class Command(BaseCommand):
             csvdict = DictReader(f)
             for row in csvdict:
                 try:
-                    # password = 'Fake_User_1234'
                     User.objects.create(**row)
                     print(row, 'добавлен')
                 except Exception as err:
@@ -121,15 +112,10 @@ class Command(BaseCommand):
                     id = row.pop('id')
                     text = row.pop('text')
                     score = row.pop('score')
-
                     if all((title, author, dt)):
-                        # print(dt)
-                        # print(row)
                         Review.objects.create(
                             title=title, author=author, id=id,
                             text=text, score=score, pub_date=dt)
-                        # obj.pub_date = dt
-                        # print(title, author, row, dt, 'добавлен')
                     else:
                         print(row, 'нельзя создать')
                 except Exception as err:
