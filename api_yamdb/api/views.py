@@ -13,7 +13,7 @@ from api_yamdb import settings
 
 from api.serializers import ReviewSerializer, CommentSerializer
 from api.serializers import CategorySerializer, GenreSerializer
-from api.serializers import TitleSerializer
+from api.serializers import TitleSerializer, TitleEditSerializer
 from api.serializers import UserEmailSerializer, ConfirmationCodeSerializer
 from api.serializers import UserSerializer, MeSerializer
 
@@ -153,7 +153,11 @@ class CategoryViewSet(
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_field = 'slug'
-    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdministratorOrReadOnly,)
+    filter_backends = (
+        filters.SearchFilter,
+    )
+    search_fields = ('name',)
 
 
 class GenreViewSet(
@@ -168,7 +172,11 @@ class GenreViewSet(
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = 'slug'
-    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdministratorOrReadOnly,)
+    filter_backends = (
+        filters.SearchFilter,
+    )
+    search_fields = ('name',)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -177,9 +185,37 @@ class TitleViewSet(viewsets.ModelViewSet):
     '''
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    # lookup_field = 'slug'
-    # pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdministratorOrReadOnly,)
+    filter_backends = (
+        filters.SearchFilter,
+    )
+    search_fields = (
+        'category__slug',
+        'name',
+        'year',
+        'genre__slug',
+    )
 
-    def perform_create(self, serializer):
-        print(serializer.is_valid)
-        return super().perform_create(serializer)
+    def create(self, request, *args, **kwargs):
+        serializer = TitleEditSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        output_serializer = TitleSerializer(serializer.instance)
+        return Response(
+            output_serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = TitleEditSerializer(data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+        output_serializer = TitleSerializer(serializer.instance)
+        return Response(output_serializer.data)
