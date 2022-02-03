@@ -60,8 +60,8 @@ class TitleSerializer(serializers.ModelSerializer):
             'description', 'genre', 'category'
         )
 
-    def get_rating(self, title_obj):
-        if title_obj.reviews.count() > 0:
-            score = title_obj.reviews.aggregate(Avg('score'))
-            return score.get('score__id')
+    def get_rating(self, title_obj: Title):
+        if title_obj.titles.count() > 0:
+            score = title_obj.titles.aggregate(Avg('score'))
+            return int(score.get('score__avg'))
         return None

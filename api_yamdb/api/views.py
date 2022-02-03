@@ -3,9 +3,10 @@ from rest_framework import viewsets  # , permissions
 from rest_framework import mixins
 from rest_framework.pagination import LimitOffsetPagination
 from reviews.models import Review, Comment
-from reviews.models import Category, Genre
+from reviews.models import Category, Genre, Title
 from api.serializers import ReviewSerializer, CommentSerializer
 from api.serializers import CategorySerializer, GenreSerializer
+from api.serializers import TitleSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -65,9 +66,23 @@ class GenreViewSet(
     mixins.DestroyModelMixin
 ):
     '''
-    Класс CategoryViewSet для модели Category.
+    Класс GenreViewSet для модели Genre.
     '''
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = 'slug'
     pagination_class = LimitOffsetPagination
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    '''
+    Класс TitleViewSet для модели Title.
+    '''
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    # lookup_field = 'slug'
+    # pagination_class = LimitOffsetPagination
+
+    def perform_create(self, serializer):
+        print(serializer.is_valid)
+        return super().perform_create(serializer)
