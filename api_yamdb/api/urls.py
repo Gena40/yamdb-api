@@ -5,6 +5,7 @@ from api.views import (
     CommentViewSet,
     CategoryViewSet,
     GenreViewSet,
+    TitleViewSet,
     UsersViewSet,
     send_confirmation_code,
     get_token
@@ -15,6 +16,7 @@ app_name = 'api'
 
 router = DefaultRouter()
 router.register('users', UsersViewSet, basename='user')
+router.register('v1/titles', TitleViewSet)
 router.register('v1/categories', CategoryViewSet)
 router.register('v1/genres', GenreViewSet)
 router.register(

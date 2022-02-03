@@ -1,13 +1,16 @@
-from rest_framework.pagination import LimitOffsetPagination
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+
 from rest_framework import filters, status, viewsets, permissions, mixins
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.pagination import PageNumberPagination
+
 from api_yamdb import settings
+
 from users.models import User
 from reviews.models import Review, Comment, Category, Genre, Title
 from api.serializers import (
@@ -18,9 +21,15 @@ from api.serializers import (
     UserSerializer,
     MeSerializer,
     CategorySerializer,
-    GenreSerializer
+    GenreSerializer,
+    TitleSerializer,
+    TitleEditSerializer
 )
-from api.permissions import IsAdministrator, AuthorStaffOrReadOnly
+from api.permissions import (
+    IsAdministrator,
+    AuthorStaffOrReadOnly,
+    IsAdministratorOrReadOnly
+)
 
 
 @api_view(['POST'])
@@ -154,7 +163,11 @@ class CategoryViewSet(
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_field = 'slug'
-    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdministratorOrReadOnly,)
+    filter_backends = (
+        filters.SearchFilter,
+    )
+    search_fields = ('name',)
 
 
 class GenreViewSet(
@@ -164,9 +177,55 @@ class GenreViewSet(
     mixins.DestroyModelMixin
 ):
     '''
-    Класс GenreViewSet для модели Category.
+    Класс GenreViewSet для модели Genre.
     '''
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = 'slug'
-    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdministratorOrReadOnly,)
+    filter_backends = (
+        filters.SearchFilter,
+    )
+    search_fields = ('name',)
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    '''
+    Класс TitleViewSet для модели Title.
+    '''
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = (IsAdministratorOrReadOnly,)
+    filter_backends = (
+        filters.SearchFilter,
+    )
+    search_fields = (
+        'category__slug',
+        'name',
+        'year',
+        'genre__slug',
+    )
+
+    def create(self, request, *args, **kwargs):
+        serializer = TitleEditSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        output_serializer = TitleSerializer(serializer.instance)
+        return Response(
+            output_serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = TitleEditSerializer(data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+        output_serializer = TitleSerializer(serializer.instance)
+        return Response(output_serializer.data)

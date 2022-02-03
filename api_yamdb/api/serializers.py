@@ -1,3 +1,4 @@
+from datetime import date
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -116,3 +117,32 @@ class TitleSerializer(serializers.ModelSerializer):
             score = title_obj.reviews.aggregate(Avg('score'))
             return score.get('score__id')
         return None
+
+
+class TitleEditSerializer(serializers.ModelSerializer):
+    '''
+    Класс TitleEditSerializer для редактирования модели Title.
+    '''
+    genre = serializers.SlugRelatedField(
+        many=True,
+        slug_field='slug',
+        queryset=Genre.objects.all(),
+    )
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all(),
+    )
+
+    class Meta:
+        model = Title
+        fields = (
+            'name', 'year', 'description', 'genre', 'category'
+        )
+
+    def validate_year(self, value):
+        now_year = date.today().year
+        if value > now_year:
+            raise serializers.ValidationError(
+                f'{value} ещё не наступил'
+            )
+        return value
