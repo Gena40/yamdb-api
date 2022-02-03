@@ -6,6 +6,38 @@ from reviews.models import Category
 from reviews.models import Genre
 from reviews.models import Title
 # from reviews.models import Genre_Title
+from users.models import User
+
+
+class UserEmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email',)
+
+
+class ConfirmationCodeSerializer(serializers.ModelSerializer):
+    confirmation_code = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code')
+
+    username = serializers.CharField()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name',
+                  'bio', 'role')
+
+
+class MeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name',
+                  'bio', 'role')
+        read_only_fields = ('role', )
 
 
 class ReviewSerializer(serializers.ModelSerializer):
