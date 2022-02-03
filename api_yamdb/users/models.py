@@ -25,16 +25,12 @@ class User(AbstractUser):
         'Биография',
         blank=True,
     )
-    email = models.EmailField(
-        'E-mail',
-        unique=True
-    )
 
     class Meta:
         constraints = (
             models.UniqueConstraint(
                 fields=('username', 'email'),
-                name='unique user'
+                name='unique user email'
             ),
         )
 

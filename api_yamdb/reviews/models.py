@@ -162,10 +162,19 @@ class Review(models.Model):
         verbose_name = 'Отзыв на произведение'
         verbose_name_plural = 'Отзывы на произведения'
         ordering = ('-pub_date',)
+        constraints = (
+            models.UniqueConstraint(
+                fields=('author', 'title'),
+                name='one_author-one_review'
+            ),
+        )
 
     def __str__(self) -> str:
         """Переопределяем метод для вывода информации об объекте."""
-        return f'Отзыв пользователя {self.author}, оценка {self.score}.'
+        return (
+            f'Отзыв пользователя {self.author} '
+            f'на произведение {self.title}, оценка {self.score}.'
+        )
 
 
 class Comment(models.Model):
@@ -185,8 +194,8 @@ class Comment(models.Model):
         Review,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='Произведение',
-        help_text='Произведение'
+        verbose_name='Отзыв на произведение',
+        help_text='Отзыв на произведение'
     )
     pub_date = models.DateTimeField(
         'Дата добавления',

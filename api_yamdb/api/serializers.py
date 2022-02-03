@@ -1,11 +1,7 @@
 from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-# from rest_framework.relations import SlugRelatedField
-from reviews.models import Review, Comment
-from reviews.models import Category
-from reviews.models import Genre
-from reviews.models import Title
-# from reviews.models import Genre_Title
+from reviews.models import Review, Comment, Category, Genre, Title
 from users.models import User
 
 
@@ -41,22 +37,45 @@ class MeSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    # author = SlugRelatedField(slug_field='username', read_only=True)
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+    def validate(self, data):
+        """Проверка чтобы пользователь не мог добавить более одного отзыва."""
+        request = self.context.get('request')
+        if request.method == 'POST':
+            user = None
+            if request and hasattr(request, 'user'):
+                user = request.user
+            kwargs = request.parser_context.get('kwargs')
+            title_id = kwargs.get('title_id')
+            title = get_object_or_404(Title, id=title_id)
+            review_exist = Review.objects.filter(
+                author=user,
+                title=title
+            ).exists()
+            if review_exist:
+                raise serializers.ValidationError(
+                    'Нельзя добавлять более одного отзыва!'
+                )
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    # author = serializers.SlugRelatedField(
-    #     read_only=True, slug_field='username'
-    # )
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
 
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
-        # read_only_fields = ('post', 'created')
 
 
 class CategorySerializer(serializers.ModelSerializer):
