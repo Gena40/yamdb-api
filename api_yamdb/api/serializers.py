@@ -25,15 +25,27 @@ class ConfirmationCodeSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name',
-                  'bio', 'role')
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
 
 
 class MeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name',
-                  'bio', 'role')
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
         read_only_fields = ('role', )
 
 
@@ -108,8 +120,13 @@ class TitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = (
-            'id', 'name', 'year', 'rating',
-            'description', 'genre', 'category'
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category'
         )
 
     def get_rating(self, title_obj):
@@ -136,13 +153,17 @@ class TitleEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = (
-            'name', 'year', 'description', 'genre', 'category'
+            'name',
+            'year',
+            'description',
+            'genre',
+            'category'
         )
 
     def validate_year(self, value):
         now_year = date.today().year
         if value > now_year:
             raise serializers.ValidationError(
-                f'{value} ещё не наступил'
+                f'{value} ещё не наступил!'
             )
         return value

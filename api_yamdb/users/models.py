@@ -32,10 +32,13 @@ class User(AbstractUser):
     )
 
     class Meta:
-        constraints = [
+        ordering = ('username',)
+        constraints = (
             models.UniqueConstraint(
-                fields=['username', 'email'], name='unique user')
-        ]
+                fields=('username', 'email'),
+                name='unique user'
+            ),
+        )
 
     @property
     def is_administrator(self):

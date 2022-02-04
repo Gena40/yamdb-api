@@ -1,10 +1,5 @@
-from django_filters import (
-    FilterSet,
-    rest_framework,
-)
-from reviews.models import (
-    Title,
-)
+from django_filters import FilterSet, rest_framework
+from reviews.models import Title
 
 
 class TitleFilter(FilterSet):
