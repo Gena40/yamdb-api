@@ -2,6 +2,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets, permissions, mixins
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
@@ -29,6 +30,9 @@ from api.permissions import (
     IsAdministrator,
     AuthorStaffOrReadOnly,
     IsAdministratorOrReadOnly
+)
+from api.filters import (
+    TitleFilter,
 )
 
 
@@ -197,14 +201,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (IsAdministratorOrReadOnly,)
     filter_backends = (
-        filters.SearchFilter,
+        DjangoFilterBackend,
     )
-    search_fields = (
-        'category__slug',
-        'name',
-        'year',
-        'genre__slug',
-    )
+    filterset_class = TitleFilter
 
     def create(self, request, *args, **kwargs):
         serializer = TitleEditSerializer(data=request.data)
@@ -221,11 +220,13 @@ class TitleViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = TitleEditSerializer(data=request.data, partial=partial)
+        serializer = TitleEditSerializer(
+            instance, data=request.data, partial=partial
+        )
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
         if getattr(instance, '_prefetched_objects_cache', None):
             instance._prefetched_objects_cache = {}
-        output_serializer = TitleSerializer(serializer.instance)
+        output_serializer = TitleSerializer(instance)
         return Response(output_serializer.data)
