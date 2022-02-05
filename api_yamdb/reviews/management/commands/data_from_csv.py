@@ -1,11 +1,30 @@
 import os
 import datetime
+import logging
+from logging.handlers import RotatingFileHandler
+
 from csv import DictReader
 from django.core.management.base import BaseCommand
-from reviews.models import Category, Genre, Title, Genre_Title
-from reviews.models import User
-from reviews.models import Review, Comment
+
+from reviews.models import (
+    Category, Genre, Title, Genre_Title,
+    User,
+    Review, Comment,
+)
+
 from api_yamdb.settings import BASE_DIR
+
+logger = logging.getLogger(__name__)
+handler = RotatingFileHandler(
+    f'./logs/{__name__}.log',
+    encoding='utf-8',
+    mode='w',
+)
+logger.addHandler(handler)
+formatter = logging.Formatter(
+    '[%(asctime)s]-[%(module)s]-[%(funcName)s]-[%(levelname)s]-%(message)s'
+)
+handler.setFormatter(formatter)
 
 
 class Command(BaseCommand):
@@ -13,14 +32,23 @@ class Command(BaseCommand):
     shift_path = os.path.join(BASE_DIR, 'static')
     shift_path = os.path.join(shift_path, 'data')
 
+    def add_arguments(self, parser) -> None:
+        parser.add_argument(
+            '-logger', type=str,
+            help='Режим логгирования'
+        )
+
     def handle(self, *args, **kwargs):
-        self.insert_categories()
-        self.insert_genres()
-        self.insert_titles()
-        self.insert_genge_titles()
-        self.insert_users()
-        self.insert_reviews()
-        self.insert_comments()
+        print('start inserts')
+        print(kwargs)
+        log_level = kwargs.get('logger')
+        # self.insert_categories()
+        # self.insert_genres()
+        # self.insert_titles()
+        # self.insert_genge_titles()
+        # self.insert_users()
+        # self.insert_reviews()
+        # self.insert_comments()
 
     def insert_categories(self):
         filename = self.shift_path + '\\category.csv'
