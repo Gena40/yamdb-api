@@ -62,21 +62,22 @@ class ReviewSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """Проверка чтобы пользователь не мог добавить более одного отзыва."""
         request = self.context.get('request')
-        if request.method == 'POST':
-            user = None
-            if request and hasattr(request, 'user'):
-                user = request.user
-            kwargs = request.parser_context.get('kwargs')
-            title_id = kwargs.get('title_id')
-            title = get_object_or_404(Title, id=title_id)
-            review_exist = Review.objects.filter(
-                author=user,
-                title=title
-            ).exists()
-            if review_exist:
-                raise serializers.ValidationError(
-                    'Нельзя добавлять более одного отзыва!'
-                )
+        if request.method != 'POST':
+            return data
+        user = None
+        if request and hasattr(request, 'user'):
+            user = request.user
+        kwargs = request.parser_context.get('kwargs')
+        title_id = kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        review_exist = Review.objects.filter(
+            author=user,
+            title=title
+        ).exists()
+        if review_exist:
+            raise serializers.ValidationError(
+                'Нельзя добавлять более одного отзыва!'
+            )
         return data
 
 
