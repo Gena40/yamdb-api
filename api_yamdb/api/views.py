@@ -36,6 +36,7 @@ from api.filters import TitleFilter
 
 USERNAME_ME = 'me'
 
+
 @api_view(('POST',))
 def send_confirmation_code(request):
     serializer = UserEmailSerializer(data=request.data)
