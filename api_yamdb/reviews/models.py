@@ -71,7 +71,7 @@ class Title(models.Model):
         verbose_name='Произведение',
         help_text='Произведение',
     )
-    year = models.IntegerField(
+    year = models.PositiveSmallIntegerField(
         verbose_name='Год выпуска',
         help_text='Год выпуска'
     )
@@ -140,8 +140,8 @@ class Review(models.Model):
         verbose_name='Произведение'
     )
     text = models.TextField(
-        'Текст отзыва',
-        help_text='Текст отзыва'
+        help_text='Текст отзыва',
+        verbose_name='Текст отзыва'
     )
     author = models.ForeignKey(
         User,
@@ -150,15 +150,15 @@ class Review(models.Model):
         help_text='Автор отзыва',
         verbose_name='Автор отзыва'
     )
-    score = models.IntegerField(
-        'Оценка произведения',
+    score = models.PositiveSmallIntegerField(
         choices=SCORES,
-        help_text='Оценка произведения'
+        help_text='Оценка произведения',
+        verbose_name='Оценка произведения'
     )
     pub_date = models.DateTimeField(
-        'Дата публикации',
         default=timezone.now,
-        help_text='Дата публикации'
+        help_text='Дата публикации',
+        verbose_name='Дата публикации'
     )
 
     class Meta:

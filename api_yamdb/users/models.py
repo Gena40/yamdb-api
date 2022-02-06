@@ -3,7 +3,7 @@ from django.db import models
 import enum
 
 
-class Roles(enum.Enum):
+class Roles(str, enum.Enum):
     USER = 'user'
     ADMIN = 'admin'
     MODERATOR = 'moderator'
@@ -42,8 +42,8 @@ class User(AbstractUser):
 
     @property
     def is_administrator(self):
-        return self.role == Roles.ADMIN.value
+        return self.role == Roles.ADMIN
 
     @property
     def is_moderator(self):
-        return self.role == Roles.MODERATOR.value
+        return self.role == Roles.MODERATOR

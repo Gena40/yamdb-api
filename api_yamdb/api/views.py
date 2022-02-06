@@ -34,12 +34,14 @@ from api.permissions import (
 from api.filters import TitleFilter
 
 
-@api_view(['POST'])
+USERNAME_ME = 'me'
+
+@api_view(('POST',))
 def send_confirmation_code(request):
     serializer = UserEmailSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data.get('username')
-    if username == 'me':
+    if username == USERNAME_ME:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     email = serializer.validated_data.get('email')
     user, created = User.objects.get_or_create(username=username, email=email)
@@ -47,19 +49,18 @@ def send_confirmation_code(request):
 
     mail_subject = 'Код подтверждения для регистрации в YaMDB'
     message = f'Ваш {mail_subject.lower()}: {confirmation_code}'
-    sender_email = settings.DEFAULT_FROM_EMAIL
     recipient_email = email
     send_mail(
         mail_subject,
         message,
-        sender_email,
-        [recipient_email],
+        settings.DEFAULT_FROM_EMAIL,
+        (recipient_email,),
         fail_silently=False
     )
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(('POST',))
 def get_token(request):
     serializer = ConfirmationCodeSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -86,23 +87,24 @@ class UsersViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
 
     @action(
-        methods=['patch', 'get'],
+        methods=('patch', 'get'),
         permission_classes=(permissions.IsAuthenticated,),
         detail=False,
-        url_path='me',
-        url_name='me'
+        url_path=USERNAME_ME,
+        url_name=USERNAME_ME
     )
     def me(self, request, *args, **kwargs):
         user = self.request.user
         serializer = MeSerializer(user)
-        if self.request.method == 'PATCH':
-            serializer = MeSerializer(
-                user,
-                data=request.data,
-                partial=True
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+        if self.request.method != 'PATCH':
+            return Response(serializer.data)
+        serializer = MeSerializer(
+            user,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data)
 
 
