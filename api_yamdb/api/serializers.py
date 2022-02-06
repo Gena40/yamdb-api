@@ -114,7 +114,7 @@ class TitleSerializer(serializers.ModelSerializer):
     '''
     Класс TitleSerializer для модели Title.
     '''
-    rating = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField(method_name='get_rating')
     genre = GenreSerializer(many=True, required=True)
     category = CategorySerializer(many=False, required=True)
 
