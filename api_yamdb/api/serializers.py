@@ -21,7 +21,6 @@ class ConfirmationCodeSerializer(serializers.Serializer):
         fields = ('username', 'confirmation_code')
 
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
