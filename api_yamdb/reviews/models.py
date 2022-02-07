@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from reviews.validators import validate_year
 
 
 User = get_user_model()
@@ -73,7 +74,8 @@ class Title(models.Model):
     )
     year = models.PositiveSmallIntegerField(
         verbose_name='Год выпуска',
-        help_text='Год выпуска'
+        help_text='Год выпуска',
+        validators=(validate_year,)
     )
     description = models.TextField(
         verbose_name='Краткое описание произведения',
